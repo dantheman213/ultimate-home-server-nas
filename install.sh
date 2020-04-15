@@ -79,7 +79,7 @@ dpkg -i --ignore-depends=python3-cheetah /tmp/wok.deb
 
 # --
 
-apt-get install -y python3-magic python3-paramiko spice-html5 novnc
+apt-get install -y python3-magic python3-paramiko spice-html5 novnc python3-libvirt python3-parted python3-guestfs python3-pil nfs-common libguestfs-tools
 curl -L -o /tmp/kimchi.deb https://github.com/kimchi-project/kimchi/releases/download/3.0.0/kimchi-3.0.0-0.noarch.deb
 dpkg -i --ignore-depends=python3-cheetah /tmp/kimchi.deb
 
