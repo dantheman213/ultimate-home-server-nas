@@ -83,6 +83,9 @@ apt-get install -y python3-magic python3-paramiko spice-html5 novnc python3-libv
 curl -L -o /tmp/kimchi.deb https://github.com/kimchi-project/kimchi/releases/download/3.0.0/kimchi-3.0.0-0.noarch.deb
 dpkg -i --ignore-depends=python3-cheetah /tmp/kimchi.deb
 
+systemctl enable wokd
+systemctl start wokd
+
 echo "Install Deluge..."
 mkdir -p $HOME/Downloads
 docker run -d --name deluge -p 8112:8112 -v /etc/deluge/config:/data -v $HOME/Downloads:/torrent --restart always lacsap/deluge-web
