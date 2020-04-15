@@ -30,7 +30,7 @@ apt-get install -y htop iotop iftop nano tmux screen vim
 echo "Install Cockpit..."
 add-apt-repository ppa:cockpit-project/cockpit
 apt-get get update
-apt-get -y install cockpit cockpit-docker
+apt-get -y install cockpit cockpit-machines cockpit-docker cockpit-packagekit cockpit-networkmanager cockpit-storaged cockpit-system
 systemctl start cockpit
 systemctl enable cockpit
 
