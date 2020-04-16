@@ -68,19 +68,27 @@ kvm-ok
 sleep 5
 
 echo "Installing Kimchi, Wok, and dependencies..."
+mkdir -p /etc/kimchi/ssl
+openssl req -nodes -newkey rsa:2048 -keyout /etc/kimchi/ssl/kimchi.key -out /etc/kimchi/ssl/kimchi.csr -subj "/C=US/ST=California/L=San Francisco/O=Kimchi/OU=IT Department/CN=kimchi.local"
+openssl x509 -signkey /etc/kimchi/ssl/kimchi.key -in /etc/kimchi/ssl/kimchi.csr -req -days 365 -out /etc/kimchi/ssl/kimchi.crt
+
 docker run -d --restart=always --name kimchi \
   -v /etc/passwd:/etc/passwd:ro \
   -v /run:/run \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v /etc/group:/etc/group:ro \
   -v /etc/shadow:/etc/shadow:ro \
   -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
   -v /var/lib/libvirt:/var/lib/libvirt \
   -v /etc/libvirt:/etc/libvirt \
   -v /storage:/storage \
+  -v /etc/kimchi/ssl/kimchi.crt:/etc/kimchi/kimchi-cert.pem:ro \
+  -v /etc/kimchi/ssl/kimchi.key:/etc/kimchi/kimchi-key.pem:ro \
   -p 8001:8001 \
   --user 0:0 \
   --privileged \
-  dantheman213/kimchi:latest
+  dantheman213/kimchi:latest \
+  /usr/sbin/init
 
 echo "Install Deluge..."
 mkdir -p $HOME/Downloads
