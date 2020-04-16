@@ -8,6 +8,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo "Starting..."
+mkdir -p /storage # placeholder for some apps. Admin should reconfigure if necessary.
 
 echo "Disable firewall... (configure and enable after setting up your core services)"
 ufw disable
@@ -67,24 +68,17 @@ kvm-ok
 sleep 5
 
 echo "Installing Kimchi, Wok, and dependencies..."
-apt-get install -y nginx python3-pip pkg-config libnl-route-3-dev
-sudo -H pip3 install -r https://raw.githubusercontent.com/kimchi-project/kimchi/master/requirements-UBUNTU.txt
-
-### Work around in 18.04 as app wants to be installed on 19.04
-pip3 install Cheetah3
-apt-get install -y python3-psutil python3-ldap python3-lxml python3-websockify python3-cherrypy3 python-m2crypto gettext
-###
-curl -L -o /tmp/wok.deb https://github.com/kimchi-project/wok/releases/download/3.0.0/wok-3.0.0-0.ubuntu.noarch.deb
-dpkg -i --ignore-depends=python3-cheetah /tmp/wok.deb
-
-# --
-
-apt-get install -y python3-magic python3-paramiko spice-html5 novnc python3-libvirt python3-parted python3-guestfs python3-pil nfs-common libguestfs-tools
-curl -L -o /tmp/kimchi.deb https://github.com/kimchi-project/kimchi/releases/download/3.0.0/kimchi-3.0.0-0.noarch.deb
-dpkg -i --ignore-depends=python3-cheetah /tmp/kimchi.deb
-
-systemctl enable wokd
-systemctl start wokd
+docker run -d --restart=always --net=host --name kimchi \
+  -v /etc/passwd:/etc/passwd:ro \
+  -v /etc/group:/etc/group:ro \
+  -v /etc/shadow:/etc/shadow:ro \
+  -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock \
+  -v /var/lib/libvirt:/var/lib/libvirt \
+  -v /etc/libvirt:/etc/libvirt \
+  -v /storage:/storage \
+  -p 8001:8001 \
+  --privileged
+  dantheman213/kimchi:latest
 
 echo "Install Deluge..."
 mkdir -p $HOME/Downloads
