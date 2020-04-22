@@ -26,7 +26,7 @@ timedatectl set-timezone UTC
 ntpdate -u time.google.com
 
 echo "Install misc tools"
-apt-get install -y htop iotop iftop nano tmux screen vim
+apt-get install -y htop iotop iftop net-tools nano tmux screen vim
 
 echo "Install Cockpit..."
 add-apt-repository ppa:cockpit-project/cockpit
