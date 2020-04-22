@@ -96,7 +96,7 @@ docker run --name kimchi \
   -p 8001:8001 \
   --user 0:0 \
   --privileged \
-  test
+  dantheman213/kimchi:latest
 
 echo "Install Deluge..."
 mkdir -p $HOME/Downloads
