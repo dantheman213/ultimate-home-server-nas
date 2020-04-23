@@ -7,12 +7,35 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied"
+    echo "./install.sh <new username>"
+fi
+
+# assign vars
+NEW_USER=$1
+
 echo "Starting..."
 mkdir -p /storage # placeholder for some apps. Admin should reconfigure if necessary.
 mkdir -p /usr/src # where we'll download some code for install
 
 echo "Disable firewall... (configure and enable after setting up your core services)"
 ufw disable
+
+echo "Creating user $NEW_USER..."
+useradd -s /bin/bash -d /home/$NEW_USER/ -m -G sudo $NEW_USER
+NEW_USER_UID=$(id -u $NEW_USER)
+
+# Enable backports / latest software releases in unstable channel
+echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" >> /etc/apt/sources.list
+
+# prefer unstable over stable software (just means latest versions will be used)
+cat << EOF 
+Package: *
+Pin: release a=trusty-backports
+Pin-Priority: 100
+EOF >> /etc/apt/preferences
 
 echo "Updating sources"
 add-apt-repository universe
@@ -29,19 +52,6 @@ ntpdate -u time.google.com
 echo "Install misc tools"
 apt-get install -y htop iotop iftop net-tools nano tmux screen vim
 
-# Dependency of vmango
-echo "Installing Golang..."
-add-apt-repository ppa:longsleep/golang-backports
-apt update
-apt install -y golang-go
-
-echo "Install Cockpit..."
-add-apt-repository ppa:cockpit-project/cockpit
-apt-get get update
-apt-get -y install cockpit cockpit-machines cockpit-docker cockpit-packagekit cockpit-networkmanager cockpit-storaged cockpit-system
-systemctl start cockpit
-systemctl enable cockpit
-
 echo "Install Docker"
 apt-get install -y docker.io
 systemctl start docker
@@ -53,47 +63,76 @@ apt-get install -y smartmontools
 echo "Install ZFS utilities"
 apt-get install -y zfsutils-linux
 
-echo "Installing and configuring Portainer..."
-docker volume create portainer_data
-docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
-
-echo "Installing and configuring Heimdall...."
-docker run \
-  -d \
-  --name=heimdall \
-  -e PUID=1000 \
-  -e PGID=1000 \
-  -e TZ=UTC \
-  -p 443:443 \
-  -v /etc/heimdall/config:/config \
-  --restart always \
-  linuxserver/heimdall
-
 echo "Installing KVM and QEMU..."
-apt-get install -y libvirt-bin qemu-kvm qemu-system
+apt-get install -y \
+libvirt-bin libvirt-clients libvirt-daemon-system libvirt-dbus \
+virtinst virtinst bridge-utils \
+qemu-block-extra qemu-kvm qemu-system
+
 kvm-ok
 sleep 5
 
-echo "Configure KVM..."
-virsh pool-define-as default dir --target /var/lib/libvirt/images/
-virsh pool-start default
-virsh pool-autostart default
+#echo "Configure KVM..."
+#modprobe kvm_intel nested=1
+#echo "options kvm_intel nested=1" >> /etc/modprobe.d/kvm.conf
+#echo "options kvm_amd nested=1" >> /etc/modprobe.d/kvm.conf
 
-echo "Installing vMango...."
-git clone https://github.com/subuk/vmango /usr/src/vmango
-cd /usr/src/vmango
-./dockerbuild.sh ubuntu-1804 make deb
-dpkg -i $(find . -name "*.deb" | head -1)
-usermod -aG libvirtd root
-newgrp libvirtd
+# ?
+#virsh pool-define-as default dir --target /var/lib/libvirt/images/
+#virsh pool-start default
+#virsh pool-autostart default
+
+echo "Install Cockpit..."
+add-apt-repository ppa:cockpit-project/cockpit
+apt-get get update
+apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
+systemctl start cockpit
+systemctl enable cockpit
+
+echo "Installing and configuring Portainer..."
+docker volume create portainer_data
+docker run -d \
+    --name=portainer \
+    -e PUID=$NEW_USER_UID \
+    -e PGID=$NEW_USER_UID \
+    -e TZ=UTC \
+    -p 8000:8000 \
+    -p 9000:9000 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    --restart always \
+    portainer/portainer
+
+echo "Installing and configuring Heimdall...."
+docker run -d \
+    --name=heimdall \
+    -e PUID=$NEW_USER_UID \
+    -e PGID=$NEW_USER_UID \
+    -e TZ=UTC \
+    -p 443:443 \
+    -v /etc/heimdall/config:/config \
+    --restart always \
+    linuxserver/heimdall
 
 echo "Install Deluge..."
 mkdir -p $HOME/Downloads
-docker run -d --name deluge -p 8112:8112 -v /etc/deluge/config:/data -v $HOME/Downloads:/torrent --restart always lacsap/deluge-web
+docker run -d \
+    --name deluge \
+    -e PUID=$NEW_USER_UID \
+    -e PGID=$NEW_USER_UID \
+    -e TZ=UTC \
+    -p 8112:8112 \
+    -v /etc/deluge/config:/data \
+    -v $HOME/Downloads:/torrent \
+    --restart always \
+    lacsap/deluge-web
 
 echo "Installing Handbrake..."
 docker run -d \
     --name handbrake \
+    -e PUID=$NEW_USER_UID \
+    -e PGID=$NEW_USER_UID \
+    -e TZ=UTC \
     -p 5800:5800 \
     -v /docker/appdata/handbrake:/config:rw \
     -v $HOME:/storage:ro \
@@ -110,7 +149,6 @@ printf "\nIndividual Service Dashboards:\n"
 echo "Cockpit: https://localhost:9090"
 echo "Deluge: http://localhost:8112"
 echo "Handbrake: http://localhost:5800"
-echo "Vmango: http://localhost:8080"
 echo "Portainer: http://localhost:9000"
 
 printf "\nCOMPLETE! Rebooting in 15 seconds....\n\n"
