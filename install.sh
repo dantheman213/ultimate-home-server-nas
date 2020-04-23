@@ -14,6 +14,7 @@ if [ $# -eq 0 ]
 fi
 
 # assign vars
+LINUX_VERSION=$(lsb_release -c | awk {'print $2'})
 NEW_USER=$1
 
 echo "Starting..."
@@ -28,14 +29,13 @@ useradd -s /bin/bash -d /home/$NEW_USER/ -m -G sudo $NEW_USER
 NEW_USER_UID=$(id -u $NEW_USER)
 
 # Enable backports / latest software releases in unstable channel
-echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu $LINUX_VERSION-backports main restricted universe multiverse" >> /etc/apt/sources.list
 
 # prefer unstable over stable software (just means latest versions will be used)
-cat << EOF 
-Package: *
-Pin: release a=trusty-backports
+cat << EOF >> /etc/apt/preferences
+Pin: release a=$LINUX_VERSION-backports
 Pin-Priority: 100
-EOF >> /etc/apt/preferences
+EOF
 
 echo "Updating sources"
 add-apt-repository universe
