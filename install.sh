@@ -35,13 +35,13 @@ apt-get update
 echo "Installing any available package upgrades"
 apt-get upgrade -y
 
+echo "Install misc tools"
+apt-get install -y htop iotop iftop net-tools nano tmux screen vim ntpdate
+
 echo "Setting timezone to UTC and syncing time with Google time server...."
 apt-get install -y ntp
 timedatectl set-timezone UTC
 ntpdate -u time.google.com
-
-echo "Install misc tools"
-apt-get install -y htop iotop iftop net-tools nano tmux screen vim
 
 echo "Install Docker"
 apt-get install -y docker.io
@@ -56,15 +56,16 @@ apt-get install -y zfsutils-linux
 
 echo "Installing KVM and QEMU..."
 apt-get install -y \
-libvirt-bin libvirt-clients libvirt-daemon-system libvirt-dbus \
-virtinst virtinst bridge-utils \
+qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-daemon-system \
+virt-top libguestfs-tools libosinfo-bin  qemu-system \
 qemu-block-extra qemu-kvm qemu-system
-
+modprobe vhost_net
+echo vhost_net | teaa -a /etc/modules
 kvm-ok
 sleep 5
 
 echo "Install Cockpit..."
-apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
+apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-machines cockpit-pcp
 systemctl start cockpit
 systemctl enable cockpit
 
