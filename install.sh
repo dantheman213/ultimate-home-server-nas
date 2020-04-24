@@ -11,6 +11,7 @@ if [ $# -eq 0 ]
   then
     echo "No arguments supplied"
     echo "./install.sh <new username>"
+    exit 0
 fi
 
 # assign vars
