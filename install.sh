@@ -64,7 +64,7 @@ kvm-ok
 sleep 5
 
 echo "Install Cockpit..."
-apt-get -t $LINUX_VERSION-backports -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
+apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
 systemctl start cockpit
 systemctl enable cockpit
 
