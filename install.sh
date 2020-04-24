@@ -29,17 +29,7 @@ echo "Creating user $NEW_USER..."
 useradd -s /bin/bash -d /home/$NEW_USER/ -m -G sudo $NEW_USER
 NEW_USER_UID=$(id -u $NEW_USER)
 
-# Enable backports / latest software releases in unstable channel
-echo "deb http://archive.ubuntu.com/ubuntu $LINUX_VERSION-backports main restricted universe multiverse" >> /etc/apt/sources.list
-
-# prefer unstable over stable software (just means latest versions will be used)
-cat << EOF >> /etc/apt/preferences
-Pin: release a=$LINUX_VERSION-backports
-Pin-Priority: 100
-EOF
-
 echo "Updating sources"
-add-apt-repository universe
 apt-get update
 
 echo "Installing any available package upgrades"
@@ -73,20 +63,8 @@ qemu-block-extra qemu-kvm qemu-system
 kvm-ok
 sleep 5
 
-#echo "Configure KVM..."
-#modprobe kvm_intel nested=1
-#echo "options kvm_intel nested=1" >> /etc/modprobe.d/kvm.conf
-#echo "options kvm_amd nested=1" >> /etc/modprobe.d/kvm.conf
-
-# ?
-#virsh pool-define-as default dir --target /var/lib/libvirt/images/
-#virsh pool-start default
-#virsh pool-autostart default
-
 echo "Install Cockpit..."
-add-apt-repository ppa:cockpit-project/cockpit
-apt-get get update
-apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
+apt-get -t $LINUX_VERSION-backports -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-docker cockpit-machines cockpit-pcp
 systemctl start cockpit
 systemctl enable cockpit
 
