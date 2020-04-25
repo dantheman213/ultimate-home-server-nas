@@ -13,7 +13,9 @@ Find the apps you need for NAS, VMs, Containers, Shares, Streams, and Services.
 * RHEL
 * CentOS
 
-#### Graphical Desktops (Server
+#### Desktop Environment (Server)
+
+If you want a DE for your server it will be best to have light-weight and low footprint.
 
 * LXDE
   - Lubuntu
