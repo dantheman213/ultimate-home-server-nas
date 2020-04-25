@@ -35,6 +35,7 @@ https://github.com/netdata/netdata
 * Rancher
 
 #### KVM / QEMU / Virtual Machine Management
+* cockpit-machines (cockpit dependency)
 * vMango
 * Kimchi
 https://github.com/kimchi-project/kimchi
@@ -94,6 +95,7 @@ https://jwallet.github.io/spy-spotify/overview.html
 * Sickrage
 * Sickbeard
 * Sonarr
+* [MultiSourceTorrentDownloader](https://github.com/aivarasatk/MultiSourceTorrentDownloader)
 
 #### Code Management
 * GitLab
