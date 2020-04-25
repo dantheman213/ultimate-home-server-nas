@@ -13,6 +13,13 @@ Find the apps you need for NAS, VMs, Containers, Shares, Streams, and Services.
 * RHEL
 * CentOS
 
+#### Graphical Desktops (Server
+
+* LXDE
+  - Lubuntu
+* XFCE
+  - Xubuntu
+
 #### Filesystem
 * ZFS with RAIDZ2 configuration
 * UnionFS + SnapRaid (a possible alternative)
