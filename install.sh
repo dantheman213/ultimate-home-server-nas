@@ -52,7 +52,7 @@ echo "Installing S.M.A.R.T. Tools..."
 apt-get install -y smartmontools
 
 echo "Install ZFS utilities"
-apt-get install -y zfsutils-linux
+apt-get install -y zfsutils-linux zfs-initramfs
 
 echo "Installing KVM and QEMU..."
 apt-get install -y \
