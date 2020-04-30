@@ -59,15 +59,20 @@ apt-get install -y \
 qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-daemon-system \
 virt-top libguestfs-tools libosinfo-bin  qemu-system \
 qemu-block-extra qemu-kvm qemu-system
-modprobe vhost_net
-echo vhost_net | teaa -a /etc/modules
 kvm-ok
 sleep 5
 
 echo "Install Cockpit..."
-apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-machines cockpit-pcp
+apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-machines cockpit-pcp cockpit-packagekit
 systemctl start cockpit
 systemctl enable cockpit
+
+echo "Install VNC server..."
+apt-get -y install tightvncserver
+sudo -u $1 vncserver -geometry 1920x1080 # Creates config files first time run
+sudo -u $1 vncserver -kill :1 # kill to edit config files
+sed -i 's|/etc/X11/Xsession|/usr/bin/startlubuntu|' /home/$1/.vnc/xstartup
+sudo -u $1 vncserver -geometry 1920x1080 # Start again
 
 echo "Installing and configuring Portainer..."
 docker volume create portainer_data
