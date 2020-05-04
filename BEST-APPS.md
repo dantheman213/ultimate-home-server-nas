@@ -91,6 +91,10 @@ NOTE: minidlna, uShare, mediatomb are no longer supported projects.
 * Spytify
 https://jwallet.github.io/spy-spotify/overview.html
 
+#### Bluray/DVD Ripper / Media Ingestion
+* MakeMKV
+* [MakeMKV Headless](https://github.com/jlesage/docker-makemkv)
+
 #### BitTorrent Client / Media Ingestion
 * Deluge with Web GUI
 * Transmission
@@ -147,6 +151,9 @@ https://jwallet.github.io/spy-spotify/overview.html
 
 #### Home Automation
 * HomeAssistant
+
+#### Dynamic DNS
+* DynDNS
 
 #### CCTV / NVR Management
 ?
