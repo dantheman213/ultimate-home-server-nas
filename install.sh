@@ -36,12 +36,10 @@ echo "Installing any available package upgrades"
 apt-get upgrade -y
 
 echo "Install misc tools"
-apt-get install -y htop iotop iftop net-tools nano tmux screen vim ntpdate
+apt-get install -y htop iotop iftop net-tools nano tmux screen vim
 
 echo "Setting timezone to UTC and syncing time with Google time server...."
-apt-get install -y ntp
 timedatectl set-timezone UTC
-ntpdate -u time.google.com
 
 echo "Install Docker"
 apt-get install -y docker.io
@@ -52,7 +50,7 @@ echo "Installing S.M.A.R.T. Tools..."
 apt-get install -y smartmontools
 
 echo "Install ZFS utilities"
-apt-get install -y zfsutils-linux zfs-initramfs
+apt-get install -y zfsutils-linux
 
 echo "Installing KVM and QEMU..."
 apt-get install -y \
@@ -66,13 +64,6 @@ echo "Install Cockpit..."
 apt-get -y install cockpit cockpit-bridge cockpit-system cockpit-ws cockpit-dashboard cockpit-networkmanager cockpit-packagekit cockpit-storaged cockpit-doc cockpit-machines cockpit-pcp cockpit-packagekit
 systemctl start cockpit
 systemctl enable cockpit
-
-echo "Install VNC server..."
-apt-get -y install tightvncserver
-sudo -u $1 vncserver -geometry 1920x1080 # Creates config files first time run
-sudo -u $1 vncserver -kill :1 # kill to edit config files
-sed -i 's|/etc/X11/Xsession|/usr/bin/startlubuntu|' /home/$1/.vnc/xstartup
-sudo -u $1 vncserver -geometry 1920x1080 # Start again
 
 echo "Installing and configuring Portainer..."
 docker volume create portainer_data
